@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Book from "../models/book";
+import { uploadImage, deleteImage } from "../utils/firebaseUtils.js";
 
 export const getAllBooks = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -23,17 +24,23 @@ export const getBookById = async (req, res) => {
 };
 
 export const createBook = asyncHandler(async (req, res) => {
-  // TODO: add upload image using firebase/storage
-  const { title, author, library, borrower, image } = req.body;
+  const { title, authorId, libraryId } = req.body;
+
+  let imageUrl = "";
+
+  if (req.file) {
+    imageUrl = await uploadImage(req.file);
+  }
 
   const book = new Book({
     title,
-    author,
-    library,
-    borrower,
-    image,
+    author: authorId,
+    library: libraryId,
+    image: imageUrl,
   });
+
   await book.save();
+
   res.status(201).json({
     message: "Book created successfully",
     book: {
@@ -44,14 +51,28 @@ export const createBook = asyncHandler(async (req, res) => {
 });
 
 export const updateBook = async (req, res) => {
-  const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+  const book = await Book.findById(req.params.id);
 
   if (!book) {
     res.status(404);
     throw new Error("Book not found");
   }
+
+  if (req.file) {
+    if (book.image) {
+      await deleteImage(book.image);
+    }
+
+    const imageUrl = await uploadImage(req.file);
+    book.image = imageUrl;
+  }
+
+  book.title = req.body.title || book.title;
+  book.author = req.body.author || book.author;
+  book.library = req.body.library || book.library;
+
+  await book.save();
+
   res.status(200).json({
     message: "Book updated successfully",
     id: book._id,
@@ -65,6 +86,10 @@ export const deleteBook = asyncHandler(async (req, res) => {
   if (!book) {
     res.status(404);
     throw new Error("Book not found");
+  }
+
+  if (book.image) {
+    await deleteImage(book.image);
   }
 
   res.status(200).json({
