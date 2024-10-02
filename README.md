@@ -22,8 +22,7 @@ bookkeeping-service
     │   └── userController.js
     ├── middleware
     │   ├── auth.js
-    │   ├── errorHandler.js
-    │   └── upload.js
+    │   └── errorHandler.js
     ├── models
     │   ├── book.js
     │   ├── library.js
@@ -64,5 +63,5 @@ bookkeeping-service
 
 ### Borrowing
 
-- **POST** /api/borrow/borrow - Borrow a book
-- **PUT** /api/borrow/return/:id - Return a borrowed book
+- **POST** `/api/borrow/borrow` - Borrow a book
+- **PUT** `/api/borrow/return/:id` - Return a borrowed book
