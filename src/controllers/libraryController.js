@@ -1,11 +1,12 @@
 import asyncHandler from "express-async-handler";
+import Library from "../models/library";
 
 export const getAllLibraries = async (req, res) => {
   res.send("getAllLibraries");
 };
 
 export const createLibrary = asyncHandler(async (req, res) => {
-  const library = new library(req.body);
+  const library = new Library(req.body);
   await library.save();
   res.status(201).json({
     message: "Library created successfully",
@@ -17,7 +18,8 @@ export const createLibrary = asyncHandler(async (req, res) => {
 });
 
 export const getLibraryById = asyncHandler(async (req, res) => {
-  const library = await library.findById(req.params.id);
+  const library = await Library.findById(req.params.id).populate("books");
+
   if (!library) {
     res.status(404);
     throw new Error("Library not found");
@@ -29,7 +31,7 @@ export const getLibraryById = asyncHandler(async (req, res) => {
 });
 
 export const updateLibrary = asyncHandler(async (req, res) => {
-  const library = await library.findByIdAndUpdate(req.params.id, req.body, {
+  const library = await Library.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
 
@@ -45,7 +47,7 @@ export const updateLibrary = asyncHandler(async (req, res) => {
 });
 
 export const deleteLibrary = async (req, res) => {
-  const library = await library.findByIdAndDelete(req.params.id);
+  const library = await Library.findByIdAndDelete(req.params.id);
 
   if (!library) {
     res.status(404);
@@ -56,9 +58,7 @@ export const deleteLibrary = async (req, res) => {
   });
 };
 
-export const getLibraryInventory = async (req, res) => {
-  res.send("getLibraryInventory");
-};
+export const getLibraryInventory = asyncHandler(async (req, res) => {});
 
 export const addBookToInventory = async (req, res) => {
   res.send("addBookToInventory");
