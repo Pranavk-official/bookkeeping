@@ -1,0 +1,899 @@
+[
+  {
+    "v": 3,
+    "name": "Portfolio Management",
+    "folders": [
+      {
+        "v": 3,
+        "name": "Admin Views",
+        "folders": [],
+        "requests": [
+          {
+            "name": "View All Stock",
+            "v": "7",
+            "testScript": "",
+            "preRequestScript": "",
+            "endpoint": "<<api-url>>/admin/stocks",
+            "method": "GET",
+            "headers": [],
+            "requestVariables": [],
+            "params": [],
+            "auth": {
+              "token": "<<admin-token>>",
+              "authActive": true,
+              "authType": "bearer"
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"stockName\": \"Tesla Inc\",\n  \"stockSymbol\": \"TSLA\",\n  \"price\": 650,\n  \"availableQuantity\": 1000\n}"
+            }
+          },
+          {
+            "requestVariables": [],
+            "testScript": "",
+            "headers": [],
+            "body": {
+              "body": "{\n  \"stockName\": \"Tesla Inc\",\n  \"stockSymbol\": \"TSLA\",\n  \"price\": 650,\n  \"availableQuantity\": 1000\n}",
+              "contentType": "application/json"
+            },
+            "endpoint": "<<api-url>>/admin/clients",
+            "name": "View All Clients",
+            "method": "GET",
+            "v": "7",
+            "auth": {
+              "authActive": true,
+              "token": "<<admin-token>>",
+              "authType": "bearer"
+            },
+            "preRequestScript": "",
+            "params": []
+          },
+          {
+            "requestVariables": [],
+            "auth": {
+              "token": "<<admin-token>>",
+              "authActive": true,
+              "authType": "bearer"
+            },
+            "params": [],
+            "method": "GET",
+            "v": "7",
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "name": "View Stock by Id",
+            "body": {
+              "body": "{\n  \"userId\": \"client003\",\n  \"password\": \"clientpassword\"\n}",
+              "contentType": "application/json"
+            },
+            "endpoint": "<<api-url>>/admin/stocks/66ea865a0ceb611a97bb877f"
+          },
+          {
+            "body": {
+              "body": "{\n  \"userId\": \"client003\",\n  \"password\": \"clientpassword\"\n}",
+              "contentType": "application/json"
+            },
+            "requestVariables": [],
+            "testScript": "",
+            "preRequestScript": "",
+            "auth": {
+              "authActive": false,
+              "token": "",
+              "authType": "bearer"
+            },
+            "headers": [],
+            "v": "7",
+            "name": "View Client by Id",
+            "params": [],
+            "endpoint": "<<api-url>>/admin/client/:id",
+            "method": "GET"
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "none"
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Admin Actions",
+        "folders": [],
+        "requests": [
+          {
+            "params": [],
+            "headers": [],
+            "auth": {
+              "authActive": true,
+              "token": "<<admin-token>>",
+              "authType": "bearer"
+            },
+            "name": "Manage Stock",
+            "testScript": "",
+            "preRequestScript": "",
+            "method": "POST",
+            "requestVariables": [],
+            "endpoint": "<<api-url>>/admin/manage-stock",
+            "body": {
+              "body": "{\n  \"stockName\": \"Tesla Inc\",\n  \"stockSymbol\": \"TSLA\",\n  \"price\": 650,\n  \"availableQuantity\": 1000\n}",
+              "contentType": "application/json"
+            },
+            "v": "7"
+          },
+          {
+            "requestVariables": [],
+            "name": "Create User",
+            "auth": {
+              "authActive": true,
+              "token": "<<admin-token>>",
+              "authType": "bearer"
+            },
+            "body": {
+              "body": "{\n  \"name\": \"Client Mike\",\n  \"userId\": \"client001\",\n  \"password\": \"clientpassword\"\n}",
+              "contentType": "application/json"
+            },
+            "method": "POST",
+            "v": "7",
+            "preRequestScript": "",
+            "headers": [],
+            "testScript": "",
+            "endpoint": "<<api-url>>/admin/create-user",
+            "params": []
+          },
+          {
+            "preRequestScript": "",
+            "endpoint": "<<api-url>>/admin/buy-stock",
+            "body": {
+              "body": "{\n  \"clientId\": \"66ea8ea3edb95b01e60ac716\",\n  \"stockId\": \"66ea865a0ceb611a97bb877f\",\n  \"quantity\": 5,\n  \"buyPrice\": 650\n}",
+              "contentType": "application/json"
+            },
+            "headers": [],
+            "testScript": "",
+            "params": [],
+            "requestVariables": [],
+            "auth": {
+              "token": "<<admin-token>>",
+              "authType": "bearer",
+              "authActive": true
+            },
+            "v": "7",
+            "method": "POST",
+            "name": "Buy Stock for Client "
+          },
+          {
+            "testScript": "",
+            "name": "Sell Stock for Client",
+            "endpoint": "<<api-url>>/admin/sell-stock",
+            "auth": {
+              "authType": "bearer",
+              "authActive": true,
+              "token": "<<client-token>>"
+            },
+            "params": [],
+            "requestVariables": [],
+            "body": {
+              "body": "",
+              "contentType": null
+            },
+            "preRequestScript": "",
+            "headers": [],
+            "method": "POST",
+            "v": "7"
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "none"
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Client",
+        "folders": [],
+        "requests": [
+          {
+            "preRequestScript": "",
+            "body": {
+              "body": "",
+              "contentType": null
+            },
+            "method": "GET",
+            "testScript": "",
+            "headers": [],
+            "v": "7",
+            "endpoint": "<<api-url>>/client/dashboard",
+            "requestVariables": [],
+            "params": [],
+            "auth": {
+              "authActive": true,
+              "authType": "bearer",
+              "token": "<<client-token>>"
+            },
+            "name": "Client Dashboard"
+          },
+          {
+            "method": "POST",
+            "endpoint": "<<api-url>>/client/add-funds",
+            "requestVariables": [],
+            "params": [],
+            "headers": [],
+            "name": "Client Add Funds",
+            "body": {
+              "contentType": null,
+              "body": ""
+            },
+            "auth": {
+              "token": "<<client-token>>",
+              "authType": "bearer",
+              "authActive": true
+            },
+            "v": "7",
+            "testScript": "",
+            "preRequestScript": ""
+          },
+          {
+            "testScript": "",
+            "requestVariables": [],
+            "preRequestScript": "",
+            "method": "GET",
+            "params": [],
+            "v": "7",
+            "name": "Password Reset",
+            "headers": [],
+            "auth": {
+              "authActive": false,
+              "authType": "bearer",
+              "token": ""
+            },
+            "endpoint": "<<api-url>>/admin/client/:id",
+            "body": {
+              "body": "{\n  \"userId\": \"client003\",\n  \"password\": \"clientpassword\"\n}",
+              "contentType": "application/json"
+            }
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "none"
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Auth",
+        "folders": [],
+        "requests": [
+          {
+            "headers": [],
+            "requestVariables": [],
+            "name": "Admin Login",
+            "testScript": "",
+            "v": "7",
+            "params": [],
+            "endpoint": "<<api-url>>/auth/admin/login",
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"userId\": \"admin123\",\n  \"password\": \"adminpassword\"\n}"
+            },
+            "auth": {
+              "authActive": false,
+              "authType": "bearer",
+              "token": "<<admin-token>>"
+            },
+            "preRequestScript": "",
+            "method": "POST"
+          },
+          {
+            "endpoint": "<<api-url>>/admin/create-user",
+            "method": "POST",
+            "testScript": "",
+            "name": "Client Login",
+            "preRequestScript": "",
+            "body": {
+              "body": "{\n  \"name\": \"Client Marko\",\n  \"userId\": \"client003\",\n  \"password\": \"clientpassword\"\n}",
+              "contentType": "application/json"
+            },
+            "headers": [],
+            "requestVariables": [],
+            "v": "7",
+            "auth": {
+              "token": "<<admin-token>>",
+              "authActive": true,
+              "authType": "bearer"
+            },
+            "params": []
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "none"
+        },
+        "headers": []
+      }
+    ],
+    "requests": [],
+    "auth": {
+      "authType": "none",
+      "authActive": true
+    },
+    "headers": []
+  },
+  {
+    "v": 3,
+    "name": "book-keeping",
+    "folders": [
+      {
+        "v": 3,
+        "name": "user",
+        "folders": [],
+        "requests": [
+          {
+            "requestVariables": [],
+            "params": [],
+            "method": "POST",
+            "auth": {
+              "authType": "bearer",
+              "token": "<<admin-token>>",
+              "authActive": true
+            },
+            "endpoint": "<<baseUrl>>users/register",
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\",\n  \"role\": \"author\"\n}\n"
+            },
+            "name": "Create User",
+            "preRequestScript": "",
+            "headers": [],
+            "testScript": "",
+            "v": "7"
+          },
+          {
+            "body": {
+              "body": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}\n",
+              "contentType": "application/json"
+            },
+            "testScript": "",
+            "name": "Login User",
+            "auth": {
+              "token": "<<admin-token>>",
+              "authActive": true,
+              "authType": "bearer"
+            },
+            "headers": [],
+            "requestVariables": [],
+            "endpoint": "<<baseUrl>>users/login",
+            "params": [],
+            "v": "7",
+            "method": "POST",
+            "preRequestScript": ""
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": []
+      }
+    ],
+    "requests": [],
+    "auth": {
+      "authType": "none",
+      "authActive": true
+    },
+    "headers": []
+  },
+  {
+    "v": 3,
+    "name": "Bookkeeping API",
+    "folders": [
+      {
+        "v": 3,
+        "name": "Users",
+        "folders": [],
+        "requests": [
+          {
+            "name": "Register User",
+            "method": "POST",
+            "requestVariables": [],
+            "params": [],
+            "testScript": "",
+            "preRequestScript": "",
+            "headers": [],
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "v": "7",
+            "body": {
+              "body": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@author.com\",\n    \"password\": \"password123\",\n    \"role\": \"author\"\n}",
+              "contentType": "application/json"
+            },
+            "endpoint": "<<base_url>>/api/users/register"
+          },
+          {
+            "v": "7",
+            "testScript": "",
+            "name": "Login User",
+            "requestVariables": [],
+            "preRequestScript": "",
+            "endpoint": "<<base_url>>/api/users/login",
+            "body": {
+              "body": "{\n    \"email\": \"john@exampple.com\",\n    \"password\": \"password123\"\n}",
+              "contentType": "application/json"
+            },
+            "params": [],
+            "headers": [],
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "method": "POST"
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Books",
+        "folders": [],
+        "requests": [
+          {
+            "requestVariables": [],
+            "testScript": "",
+            "params": [],
+            "endpoint": "<<base_url>>/api/books",
+            "method": "GET",
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "name": "Get All Books",
+            "v": "7",
+            "preRequestScript": "",
+            "headers": [
+              {
+                "value": "Bearer <<token>>",
+                "key": "Authorization",
+                "active": true,
+                "description": ""
+              }
+            ]
+          },
+          {
+            "requestVariables": [],
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "headers": [
+              {
+                "description": "",
+                "active": true,
+                "key": "Authorization",
+                "value": "Bearer <<token>>"
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "v": "7",
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "params": [],
+            "name": "Get Book by ID",
+            "method": "GET",
+            "endpoint": "<<base_url>>/api/books/<<book_id>>"
+          },
+          {
+            "body": {
+              "body": [
+                {
+                  "active": true,
+                  "isFile": false,
+                  "key": "title",
+                  "value": "The Great Gatsby"
+                },
+                {
+                  "isFile": false,
+                  "value": "<<author_id>>",
+                  "key": "authorId",
+                  "active": true
+                },
+                {
+                  "key": "libraryId",
+                  "isFile": false,
+                  "value": "<<library_id>>",
+                  "active": true
+                },
+                {
+                  "isFile": false,
+                  "key": "image",
+                  "value": "",
+                  "active": true
+                }
+              ],
+              "contentType": "multipart/form-data"
+            },
+            "params": [],
+            "name": "Create Book",
+            "v": "7",
+            "requestVariables": [],
+            "method": "POST",
+            "endpoint": "<<base_url>>/api/books",
+            "testScript": "",
+            "preRequestScript": "",
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "active": true,
+                "description": ""
+              }
+            ]
+          },
+          {
+            "params": [],
+            "name": "Update Book",
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n    \"title\": \"Updated Book Title\"\n}"
+            },
+            "v": "7",
+            "preRequestScript": "",
+            "testScript": "",
+            "headers": [
+              {
+                "description": "",
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "active": true
+              }
+            ],
+            "endpoint": "<<base_url>>/api/books/<<book_id>>",
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "method": "PUT",
+            "requestVariables": []
+          },
+          {
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "preRequestScript": "",
+            "requestVariables": [],
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "params": [],
+            "method": "DELETE",
+            "headers": [
+              {
+                "value": "Bearer <<token>>",
+                "active": true,
+                "description": "",
+                "key": "Authorization"
+              }
+            ],
+            "v": "7",
+            "name": "Delete Book",
+            "endpoint": "<<base_url>>/api/books/<<book_id>>",
+            "testScript": ""
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Libraries",
+        "folders": [],
+        "requests": [
+          {
+            "endpoint": "<<base_url>>/api/libraries",
+            "preRequestScript": "",
+            "headers": [
+              {
+                "description": "",
+                "active": true,
+                "key": "Authorization",
+                "value": "Bearer <<token>>"
+              }
+            ],
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "params": [],
+            "v": "7",
+            "name": "Get All Libraries",
+            "method": "GET",
+            "testScript": "",
+            "requestVariables": []
+          },
+          {
+            "testScript": "",
+            "requestVariables": [],
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>",
+            "headers": [
+              {
+                "value": "Bearer <<token>>",
+                "key": "Authorization",
+                "description": "",
+                "active": true
+              }
+            ],
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "params": [],
+            "v": "7",
+            "preRequestScript": "",
+            "method": "GET",
+            "name": "Get Library by ID"
+          },
+          {
+            "preRequestScript": "",
+            "requestVariables": [],
+            "headers": [
+              {
+                "key": "Authorization",
+                "active": true,
+                "description": "",
+                "value": "Bearer <<author_token>>"
+              }
+            ],
+            "params": [],
+            "endpoint": "<<base_url>>/api/libraries",
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n    \"name\": \"Central Library\"\n}"
+            },
+            "name": "Create Library",
+            "v": "7",
+            "testScript": "",
+            "method": "POST"
+          },
+          {
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "v": "7",
+            "testScript": "",
+            "requestVariables": [],
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>",
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n    \"name\": \"Updated Library Name\"\n}"
+            },
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "method": "PUT",
+            "name": "Update Library",
+            "preRequestScript": ""
+          },
+          {
+            "requestVariables": [],
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>",
+            "preRequestScript": "",
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "params": [],
+            "headers": [
+              {
+                "description": "",
+                "active": true,
+                "key": "Authorization",
+                "value": "Bearer <<token>>"
+              }
+            ],
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "method": "DELETE",
+            "v": "7",
+            "name": "Delete Library",
+            "testScript": ""
+          },
+          {
+            "params": [],
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "preRequestScript": "",
+            "requestVariables": [],
+            "testScript": "",
+            "name": "Get Library Inventory",
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>/inventory",
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            },
+            "v": "7",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "description": "",
+                "active": true
+              }
+            ],
+            "method": "GET"
+          },
+          {
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "description": "",
+                "active": true
+              }
+            ],
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>/inventory",
+            "requestVariables": [],
+            "params": [],
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "testScript": "",
+            "body": {
+              "body": "{\n    \"bookId\": \"<<book_id>>\"\n}",
+              "contentType": "application/json"
+            },
+            "method": "POST",
+            "name": "Add Book to Inventory",
+            "v": "7",
+            "preRequestScript": ""
+          },
+          {
+            "v": "7",
+            "endpoint": "<<base_url>>/api/libraries/<<library_id>>/inventory/<<book_id>>",
+            "method": "DELETE",
+            "requestVariables": [],
+            "params": [],
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "preRequestScript": "",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<token>>",
+                "description": "",
+                "active": true
+              }
+            ],
+            "name": "Remove Book from Inventory",
+            "testScript": "",
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            }
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": []
+      },
+      {
+        "v": 3,
+        "name": "Borrowing",
+        "folders": [],
+        "requests": [
+          {
+            "requestVariables": [],
+            "auth": {
+              "authActive": true,
+              "authType": "none"
+            },
+            "preRequestScript": "",
+            "body": {
+              "body": "{\n    \"bookId\": \"<<book_id>>\"\n}",
+              "contentType": "application/json"
+            },
+            "headers": [
+              {
+                "description": "",
+                "value": "Bearer <<token>>",
+                "active": true,
+                "key": "Authorization"
+              }
+            ],
+            "method": "POST",
+            "name": "Borrow Book",
+            "v": "7",
+            "params": [],
+            "testScript": "",
+            "endpoint": "<<base_url>>/api/borrow"
+          },
+          {
+            "requestVariables": [],
+            "params": [],
+            "endpoint": "<<base_url>>/api/return/<<book_id>>",
+            "method": "PUT",
+            "headers": [
+              {
+                "value": "Bearer <<token>>",
+                "key": "Authorization",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "v": "7",
+            "name": "Return Book",
+            "testScript": "",
+            "preRequestScript": "",
+            "body": {
+              "body": null,
+              "contentType": null
+            },
+            "auth": {
+              "authType": "none",
+              "authActive": true
+            }
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "inherit"
+        },
+        "headers": []
+      }
+    ],
+    "requests": [],
+    "auth": {
+      "authActive": true,
+      "authType": "inherit"
+    },
+    "headers": []
+  }
+]
