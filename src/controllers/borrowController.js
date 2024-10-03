@@ -1,22 +1,29 @@
-// import Book from "../models/Book";
-// import Library from "../models/library";
+// src/controllers/borrowController.js
+import Book from "../models/book.js";
+import Library from "../models/library.js";
+import { getMessage } from "../utils/languageUtils.js";
+import asyncHandler from "express-async-handler";
 
-export const borrowBook = async (req, res) => {
+export const borrowBook = asyncHandler(async (req, res) => {
   const { bookId } = req.body;
-
   const book = await Book.findById(bookId);
 
   if (!book) {
     res.status(404);
-    throw new Error("Book not found");
+    throw new Error(getMessage("bookNotFound", req.headers["accept-language"]));
   }
 
   if (book.borrower) {
-    return res.status(400).json({ message: "Book already borrowed" });
+    res.status(400);
+    throw new Error(
+      getMessage("bookAlreadyBorrowed", req.headers["accept-language"])
+    );
   }
 
-  book.borrower.user = req.user._id;
-  book.borrower.borrowedAt = Date.now();
+  book.borrower = {
+    user: req.user._id,
+    borrowedAt: Date.now(),
+  };
 
   const library = await Library.findById(book.library);
   library.borrowedBooks.push({
@@ -26,24 +33,38 @@ export const borrowBook = async (req, res) => {
   });
 
   await Promise.all([book.save(), library.save()]);
-  res.status(200).json({ message: "Book borrowed successfully" });
-};
 
-export const returnBook = async (req, res) => {
+  res.json({
+    message: getMessage(
+      "bookBorrowedSuccessfully",
+      req.headers["accept-language"]
+    ),
+    book,
+  });
+});
+
+export const returnBook = asyncHandler(async (req, res) => {
   const { bookId } = req.body;
   const book = await Book.findById(bookId);
+
   if (!book) {
     res.status(404);
-    throw new Error("Book not found");
+    throw new Error(getMessage("bookNotFound", req.headers["accept-language"]));
   }
+
   if (!book.borrower) {
-    return res.status(400).json({ message: "Book not borrowed" });
+    res.status(400);
+    throw new Error(
+      getMessage("bookNotBorrowed", req.headers["accept-language"])
+    );
   }
+
   if (book.borrower.user.toString() !== req.user._id.toString()) {
-    return res.status(400).json({ message: "You are not the borrower" });
+    res.status(403);
+    throw new Error(getMessage("notBorrower", req.headers["accept-language"]));
   }
-  book.borrower.user = null;
-  book.borrower.returnedAt = Date.now();
+
+  book.borrower = null;
 
   const library = await Library.findById(book.library);
   const borrowedBookIndex = library.borrowedBooks.findIndex(
@@ -55,5 +76,11 @@ export const returnBook = async (req, res) => {
 
   await Promise.all([book.save(), library.save()]);
 
-  res.status(200).json({ message: "Book returned successfully" });
-};
+  res.json({
+    message: getMessage(
+      "bookReturnedSuccessfully",
+      req.headers["accept-language"]
+    ),
+    book,
+  });
+});

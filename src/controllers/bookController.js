@@ -1,98 +1,103 @@
-import asyncHandler from "express-async-handler";
-import Book from "../models/Book.js";
-import { uploadImage, deleteImage } from "../utils/firebaseUtils.js";
+// src/controllers/bookController.js
+import Book from "../models/book.js";
+import Library from "../models/library.js";
+import { getMessage } from "../utils/languageUtils.js";
 
-export const getAllBooks = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+export const borrowBook = async (req, res) => {
+  try {
+    const { bookId } = req.body;
+    const book = await Book.findById(bookId);
 
-  const books = await Book.find().skip(skip).limit(limit).lean();
-
-  const totalBooks = await Book.countDocuments();
-
-  res.json({
-    books,
-    totalPages: Math.ceil(totalBooks / limit),
-    currentPage: page,
-    totalBooks,
-  });
-};
-
-export const getBookById = async (req, res) => {
-  res.send("getBookById");
-};
-
-export const createBook = asyncHandler(async (req, res) => {
-  const { title, authorId, libraryId } = req.body;
-
-  let imageUrl = "";
-
-  if (req.file) {
-    imageUrl = await uploadImage(req.file);
-  }
-
-  const book = new Book({
-    title,
-    author: authorId,
-    library: libraryId,
-    image: imageUrl,
-  });
-
-  await book.save();
-
-  res.status(201).json({
-    message: "Book created successfully",
-    book: {
-      id: book._id,
-      title: book.title,
-    },
-  });
-});
-
-export const updateBook = async (req, res) => {
-  const book = await Book.findById(req.params.id);
-
-  if (!book) {
-    res.status(404);
-    throw new Error("Book not found");
-  }
-
-  if (req.file) {
-    if (book.image) {
-      await deleteImage(book.image);
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
     }
 
-    const imageUrl = await uploadImage(req.file);
-    book.image = imageUrl;
+    if (book.borrower) {
+      return res.status(400).json({
+        message: getMessage(
+          "bookAlreadyBorrowed",
+          req.headers["accept-language"]
+        ),
+      });
+    }
+
+    book.borrower = {
+      user: req.user._id,
+      borrowedAt: Date.now(),
+    };
+
+    const library = await Library.findById(book.library);
+    library.borrowedBooks.push({
+      book: book._id,
+      borrower: req.user._id,
+      borrowedAt: Date.now(),
+    });
+
+    await Promise.all([book.save(), library.save()]);
+
+    res.json({
+      message: getMessage(
+        "bookBorrowedSuccessfully",
+        req.headers["accept-language"]
+      ),
+      book,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage("errorBorrowingBook", req.headers["accept-language"]),
+      error: error.message,
+    });
   }
-
-  book.title = req.body.title || book.title;
-  book.author = req.body.author || book.author;
-  book.library = req.body.library || book.library;
-
-  await book.save();
-
-  res.status(200).json({
-    message: "Book updated successfully",
-    id: book._id,
-    title: book.title,
-  });
 };
 
-export const deleteBook = asyncHandler(async (req, res) => {
-  const book = await Book.findByIdAndDelete(req.params.id);
+export const returnBook = async (req, res) => {
+  try {
+    const { bookId } = req.body;
+    const book = await Book.findById(bookId);
 
-  if (!book) {
-    res.status(404);
-    throw new Error("Book not found");
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    if (!book.borrower) {
+      return res.status(400).json({
+        message: getMessage("bookNotBorrowed", req.headers["accept-language"]),
+      });
+    }
+
+    if (book.borrower.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: getMessage("notBorrower", req.headers["accept-language"]),
+      });
+    }
+
+    book.borrower = null;
+
+    const library = await Library.findById(book.library);
+    const borrowedBookIndex = library.borrowedBooks.findIndex(
+      (borrowedBook) => borrowedBook.book.toString() === bookId
+    );
+    if (borrowedBookIndex !== -1) {
+      library.borrowedBooks.splice(borrowedBookIndex, 1);
+    }
+
+    await Promise.all([book.save(), library.save()]);
+
+    res.json({
+      message: getMessage(
+        "bookReturnedSuccessfully",
+        req.headers["accept-language"]
+      ),
+      book,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage("errorReturningBook", req.headers["accept-language"]),
+      error: error.message,
+    });
   }
-
-  if (book.image) {
-    await deleteImage(book.image);
-  }
-
-  res.status(200).json({
-    message: "Book deleted successfully",
-  });
-});
+};
