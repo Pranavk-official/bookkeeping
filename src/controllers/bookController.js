@@ -1,61 +1,47 @@
 // src/controllers/bookController.js
-import Book from "../models/book.js";
-import Library from "../models/library.js";
+import Book from "../models/Book.js";
+import { uploadImage, deleteImage } from "../utils/firebaseUtils.js";
 import { getMessage } from "../utils/languageUtils.js";
 
-export const borrowBook = async (req, res) => {
+export const getAllBooks = async (req, res) => {
   try {
-    const { bookId } = req.body;
-    const book = await Book.findById(bookId);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    if (!book) {
-      return res.status(404).json({
-        message: getMessage("bookNotFound", req.headers["accept-language"]),
-      });
-    }
+    const books = await Book.find()
+      .select("title author library borrower image")
+      .populate("author", "name")
+      .populate("library", "name")
+      .populate("borrower", "name")
+      .skip(skip)
+      .limit(limit)
+      .lean();
 
-    if (book.borrower) {
-      return res.status(400).json({
-        message: getMessage(
-          "bookAlreadyBorrowed",
-          req.headers["accept-language"]
-        ),
-      });
-    }
-
-    book.borrower = {
-      user: req.user._id,
-      borrowedAt: Date.now(),
-    };
-
-    const library = await Library.findById(book.library);
-    library.borrowedBooks.push({
-      book: book._id,
-      borrower: req.user._id,
-      borrowedAt: Date.now(),
-    });
-
-    await Promise.all([book.save(), library.save()]);
+    const totalBooks = await Book.countDocuments();
 
     res.json({
-      message: getMessage(
-        "bookBorrowedSuccessfully",
-        req.headers["accept-language"]
-      ),
-      book,
+      books,
+      currentPage: page,
+      totalPages: Math.ceil(totalBooks / limit),
+      totalBooks,
     });
   } catch (error) {
     res.status(500).json({
-      message: getMessage("errorBorrowingBook", req.headers["accept-language"]),
+      message: getMessage("errorFetchingBooks", req.headers["accept-language"]),
       error: error.message,
     });
   }
 };
 
-export const returnBook = async (req, res) => {
+export const getBookById = async (req, res) => {
   try {
-    const { bookId } = req.body;
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(req.params.id)
+      .select("title author library borrower image")
+      .populate("author", "name")
+      .populate("library", "name")
+      .populate("borrower", "name")
+      .lean();
 
     if (!book) {
       return res.status(404).json({
@@ -63,40 +49,115 @@ export const returnBook = async (req, res) => {
       });
     }
 
-    if (!book.borrower) {
-      return res.status(400).json({
-        message: getMessage("bookNotBorrowed", req.headers["accept-language"]),
-      });
+    res.json(book);
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage("errorFetchingBook", req.headers["accept-language"]),
+      error: error.message,
+    });
+  }
+};
+
+export const createBook = async (req, res) => {
+  try {
+    const { title, authorId, libraryId } = req.body;
+    let imageUrl = "";
+
+    if (req.file) {
+      imageUrl = await uploadImage(req.file);
     }
 
-    if (book.borrower.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        message: getMessage("notBorrower", req.headers["accept-language"]),
-      });
-    }
+    const book = new Book({
+      title,
+      author: authorId,
+      library: libraryId,
+      image: imageUrl,
+    });
 
-    book.borrower = null;
+    await book.save();
 
-    const library = await Library.findById(book.library);
-    const borrowedBookIndex = library.borrowedBooks.findIndex(
-      (borrowedBook) => borrowedBook.book.toString() === bookId
-    );
-    if (borrowedBookIndex !== -1) {
-      library.borrowedBooks.splice(borrowedBookIndex, 1);
-    }
-
-    await Promise.all([book.save(), library.save()]);
-
-    res.json({
+    res.status(201).json({
       message: getMessage(
-        "bookReturnedSuccessfully",
+        "bookCreatedSuccessfully",
         req.headers["accept-language"]
       ),
-      book,
+      book: {
+        id: book._id,
+        title: book.title,
+      },
     });
   } catch (error) {
     res.status(500).json({
-      message: getMessage("errorReturningBook", req.headers["accept-language"]),
+      message: getMessage("errorCreatingBook", req.headers["accept-language"]),
+      error: error.message,
+    });
+  }
+};
+
+export const updateBook = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    if (req.file) {
+      if (book.image) {
+        await deleteImage(book.image);
+      }
+      book.image = await uploadImage(req.file);
+    }
+
+    book.title = req.body.title || book.title;
+    book.author = req.body.authorId || book.author;
+    book.library = req.body.libraryId || book.library;
+
+    await book.save();
+
+    res.json({
+      message: getMessage(
+        "bookUpdatedSuccessfully",
+        req.headers["accept-language"]
+      ),
+      book: {
+        id: book._id,
+        title: book.title,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage("errorUpdatingBook", req.headers["accept-language"]),
+      error: error.message,
+    });
+  }
+};
+
+export const deleteBook = async (req, res) => {
+  try {
+    const book = await Book.findByIdAndDelete(req.params.id);
+
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    if (book.image) {
+      await deleteImage(book.image);
+    }
+
+    res.json({
+      message: getMessage(
+        "bookDeletedSuccessfully",
+        req.headers["accept-language"]
+      ),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage("errorDeletingBook", req.headers["accept-language"]),
       error: error.message,
     });
   }

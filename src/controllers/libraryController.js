@@ -1,6 +1,6 @@
 // src/controllers/libraryController.js
 import Library from "../models/Library.js";
-import Book from "../models/book.js";
+import Book from "../models/Book.js";
 import { getMessage } from "../utils/languageUtils.js";
 
 export const getAllLibraries = async (req, res) => {
