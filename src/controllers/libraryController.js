@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import Library from "../models/library";
+import Library from "../models/Library.js";
 
 export const getAllLibraries = async (req, res) => {
   res.send("getAllLibraries");

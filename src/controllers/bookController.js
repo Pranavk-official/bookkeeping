@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import Book from "../models/book";
+import Book from "../models/Book.js";
 import { uploadImage, deleteImage } from "../utils/firebaseUtils.js";
 
 export const getAllBooks = async (req, res) => {

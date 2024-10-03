@@ -1,4 +1,4 @@
-import { verifyToken } from "../utils/jwtUtils";
+// import { verifyToken } from "../utils/jwtUtils";
 
 const auth = (req, res, next) => {
   try {
