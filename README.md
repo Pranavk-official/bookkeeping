@@ -35,8 +35,62 @@ bookkeeping-service
     ├── server.js
     └── utils
         ├── jwtUtils.js
+        ├── firebaseUtils.js
         └── languageUtils.js
 ```
+
+## Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   cd bookkeeping-service
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables (see [Environment Variables](#environment-variables) section).
+
+4. Set up MongoDB and Firebase (follow their respective documentation for setup instructions).
+
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following variables:
+
+```
+PORT=3000
+MONGO_URI=<your-mongodb-connection-string>
+JWT_SECRET=<your-jwt-secret>
+FIREBASE_API_KEY=<your-firebase-api-key>
+FIREBASE_AUTH_DOMAIN=<your-firebase-auth-domain>
+FIREBASE_PROJECT_ID=<your-firebase-project-id>
+FIREBASE_STORAGE_BUCKET=<your-firebase-storage-bucket>
+FIREBASE_MESSAGING_SENDER_ID=<your-firebase-messaging-sender-id>
+FIREBASE_APP_ID=<your-firebase-app-id>
+```
+
+Replace `<...>` with your actual values.
+
+## Running the Application
+
+To start the server in development mode:
+
+```
+npm run dev
+```
+
+To start the server in production mode:
+
+```
+npm start
+```
+
+The server will start on the port specified in your environment variables (default is 3000).
 
 ## API Endpoints
 
