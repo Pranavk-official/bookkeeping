@@ -1,91 +1,229 @@
-import asyncHandler from "express-async-handler";
-import Library from "../models/Library.js";
+// src/controllers/libraryController.js
+import Library from "../models/library.js";
+import Book from "../models/book.js";
+import { getMessage } from "../utils/languageUtils.js";
 
 export const getAllLibraries = async (req, res) => {
-  res.send("getAllLibraries");
+  try {
+    const libraries = await Library.find().lean();
+    res.json(libraries);
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorFetchingLibraries",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
+  }
 };
 
-export const createLibrary = asyncHandler(async (req, res) => {
-  const library = new Library(req.body);
-  await library.save();
-  res.status(201).json({
-    message: "Library created successfully",
-    library: {
-      id: library._id,
-      name: library.name,
-    },
-  });
-});
+export const getLibraryById = async (req, res) => {
+  try {
+    const library = await Library.findById(req.params.id)
+      .populate("books")
+      .lean();
 
-export const getLibraryById = asyncHandler(async (req, res) => {
-  const library = await Library.findById(req.params.id).populate("books");
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
 
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
+    res.json(library);
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorFetchingLibrary",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
   }
-  res.json({
-    id: library._id,
-    name: library.name,
-  });
-});
+};
 
-export const updateLibrary = asyncHandler(async (req, res) => {
-  const library = await Library.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+export const createLibrary = async (req, res) => {
+  try {
+    const library = new Library(req.body);
+    await library.save();
 
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
+    res.status(201).json({
+      message: getMessage(
+        "libraryCreatedSuccessfully",
+        req.headers["accept-language"]
+      ),
+      library: {
+        id: library._id,
+        name: library.name,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorCreatingLibrary",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
   }
-  res.json({
-    message: "Library updated successfully",
-    id: library._id,
-    name: library.name,
-  });
-});
+};
+
+export const updateLibrary = async (req, res) => {
+  try {
+    const library = await Library.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    res.json({
+      message: getMessage(
+        "libraryUpdatedSuccessfully",
+        req.headers["accept-language"]
+      ),
+      library: {
+        id: library._id,
+        name: library.name,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorUpdatingLibrary",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
+  }
+};
 
 export const deleteLibrary = async (req, res) => {
-  const library = await Library.findByIdAndDelete(req.params.id);
+  try {
+    const library = await Library.findByIdAndDelete(req.params.id);
 
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    res.json({
+      message: getMessage(
+        "libraryDeletedSuccessfully",
+        req.headers["accept-language"]
+      ),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorDeletingLibrary",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
   }
-  res.json({
-    message: "Library deleted successfully",
-  });
 };
 
-export const getLibraryInventory = asyncHandler(async (req, res) => {
-  const library = await Library.findById(req.params.id).populate("books");
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
-  }
+export const getLibraryInventory = async (req, res) => {
+  try {
+    const library = await Library.findById(req.params.id).populate("books");
 
-  res.status(200).json(library.books);
-});
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    res.json(library.books);
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorFetchingInventory",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
+  }
+};
 
 export const addBookToInventory = async (req, res) => {
-  const library = await Library.findById(req.params.id);
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
+  try {
+    const library = await Library.findById(req.params.id);
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    const book = await Book.findById(req.body.bookId);
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    library.books.push(book._id);
+    book.library = library._id;
+    await Promise.all([library.save(), book.save()]);
+
+    res.json({
+      message: getMessage(
+        "bookAddedToInventory",
+        req.headers["accept-language"]
+      ),
+      book,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorAddingToInventory",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
   }
-  library.books.push(req.body.bookId);
-  await library.save();
-  res.status(200).json({ message: "Book added to inventory" });
 };
 
 export const removeBookFromInventory = async (req, res) => {
-  const library = await Library.findById(req.params.id);
-  if (!library) {
-    res.status(404);
-    throw new Error("Library not found");
+  try {
+    const library = await Library.findById(req.params.id);
+    if (!library) {
+      return res.status(404).json({
+        message: getMessage("libraryNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    const book = await Book.findById(req.params.bookId);
+    if (!book) {
+      return res.status(404).json({
+        message: getMessage("bookNotFound", req.headers["accept-language"]),
+      });
+    }
+
+    library.books = library.books.filter(
+      (id) => id.toString() !== book._id.toString()
+    );
+    book.library = null;
+    await Promise.all([library.save(), book.save()]);
+
+    res.json({
+      message: getMessage(
+        "bookRemovedFromInventory",
+        req.headers["accept-language"]
+      ),
+      book,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: getMessage(
+        "errorRemovingFromInventory",
+        req.headers["accept-language"]
+      ),
+      error: error.message,
+    });
   }
-  library.books.pull(req.body.bookId);
-  await library.save();
-  res.status(200).json({ message: "Book removed from inventory" });
 };
