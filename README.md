@@ -1,5 +1,20 @@
 # Bookkeeping Service
 
+## Table of Contents
+
+- [Bookkeeping Service](#bookkeeping-service)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Project Structure](#project-structure)
+  - [Setup](#setup)
+  - [Environment Variables](#environment-variables)
+  - [Running the Application](#running-the-application)
+  - [API Endpoints](#api-endpoints)
+    - [Users](#users)
+    - [Books](#books)
+    - [Libraries](#libraries)
+    - [Borrowing](#borrowing)
+
 ## Description
 
 This project is a bookkeeping service API that manages books, users (authors and borrowers), and libraries. It provides functionality for user authentication, book management, library management, and book borrowing operations.
