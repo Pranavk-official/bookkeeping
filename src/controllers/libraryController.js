@@ -1,5 +1,5 @@
 // src/controllers/libraryController.js
-import Library from "../models/library.js";
+import Library from "../models/Library.js";
 import Book from "../models/book.js";
 import { getMessage } from "../utils/languageUtils.js";
 
