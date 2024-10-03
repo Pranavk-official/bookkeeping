@@ -13,7 +13,6 @@ import auth from "../middleware/auth.js";
 const router = express.Router();
 
 router.route("/").get(auth, getAllBooks).post(auth, createBook);
-
 router
   .route("/:id")
   .get(auth, getBookById)

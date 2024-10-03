@@ -9,7 +9,11 @@ const bookSchema = new mongoose.Schema({
     ref: "Library",
     required: true,
   },
-  borrower: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  borrower: {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    borrowedAt: { type: Date },
+    returnedAt: { type: Date },
+  },
   image: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

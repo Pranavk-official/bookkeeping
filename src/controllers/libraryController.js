@@ -58,12 +58,34 @@ export const deleteLibrary = async (req, res) => {
   });
 };
 
-export const getLibraryInventory = asyncHandler(async (req, res) => {});
+export const getLibraryInventory = asyncHandler(async (req, res) => {
+  const library = await Library.findById(req.params.id).populate("books");
+  if (!library) {
+    res.status(404);
+    throw new Error("Library not found");
+  }
+
+  res.status(200).json(library.books);
+});
 
 export const addBookToInventory = async (req, res) => {
-  res.send("addBookToInventory");
+  const library = await Library.findById(req.params.id);
+  if (!library) {
+    res.status(404);
+    throw new Error("Library not found");
+  }
+  library.books.push(req.body.bookId);
+  await library.save();
+  res.status(200).json({ message: "Book added to inventory" });
 };
 
 export const removeBookFromInventory = async (req, res) => {
-  res.send("removeBookFromInventory");
+  const library = await Library.findById(req.params.id);
+  if (!library) {
+    res.status(404);
+    throw new Error("Library not found");
+  }
+  library.books.pull(req.body.bookId);
+  await library.save();
+  res.status(200).json({ message: "Book removed from inventory" });
 };
