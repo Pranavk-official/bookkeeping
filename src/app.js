@@ -20,6 +20,10 @@ app.use("/api/borrows", borrowRoutes);
 app.use("/api/libraries", libraryRoutes);
 app.use("/api/users", userRoutes);
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 // Error handling middleware
 app.use(errorHandler);
 
