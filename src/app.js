@@ -21,6 +21,7 @@ app.use("/api/libraries", libraryRoutes);
 app.use("/api/users", userRoutes);
 
 app.get("/ping", (req, res) => {
+  console.log(`Ping received from ${req.ip}, ${new Date()}`);
   res.send("pong");
 });
 
